@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import "tailwindcss";
+
+@tailwind utilities;
+
+*{
+   font-family: "Outfit", sans-serif;
+}
+html{
+  scroll-behavior: smooth;
+}
+
+@theme{
+  --color-primary: #2563eb;
+  --color-primary-dull: #1f58d8;
+  --color-light: #f1f5f9;
+  --color-borderColor: #c4c7d2;
+}
+
+#hero{
+  background-image: url('bg-image.jpg');
+  background-size: cover;
+  background-position: center;
+
+}
+@utility fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+@utility fade-in-delay {
+  animation: fadeIn 1.3s ease-out forwards;
+}
+
+@utility slide-up {
+  animation: fadeIn 1.2s ease-out forwards;
+}
+
+@utility float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@utility glow-move {
+  animation: glowMove 8s ease-in-out infinite;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); opacity: 0.7; }
+  50% { transform: translateY(-25px); opacity: 1; }
+  100% { transform: translateY(0px); opacity: 0.7; }
+}
+
+@keyframes glowMove {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(40px, -20px); }
+  100% { transform: translate(0, 0); }
+}
