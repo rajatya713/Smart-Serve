@@ -1,6 +1,6 @@
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
-import Home from './pages/home'
+import Home from './pages/Home'
 import CustomerLogin from './pages/CustomerLogin.jsx'
 import CustomerRegister from './pages/CustomerRegisteration.jsx'
 import CustomerDashboard from './pages/customerDashboard.jsx'
