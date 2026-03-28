@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import dotenv from "dotenv";
-dotenv.config();
 
-const apiUrl = process.env.VITE_API_BASE_URL;
+// Vite exposes env variables via import.meta.env — no dotenv needed in frontend
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const CustomerLogin = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +19,6 @@ const CustomerLogin = () => {
     setError("");
     setToast("");
 
-    // Basic frontend validation
     if (!email.includes("@")) {
       setError("Please enter a valid email.");
       return;
@@ -33,7 +31,7 @@ const CustomerLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${apiUrl}/api/users/login`, {
+      const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -46,7 +44,6 @@ const CustomerLogin = () => {
         return;
       }
 
-      // Save token and user info to localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify({
         _id: data._id,
@@ -57,7 +54,6 @@ const CustomerLogin = () => {
 
       setToast("Login successful! Redirecting...");
 
-      // Redirect to customer dashboard after short delay
       setTimeout(() => {
         navigate("/customer/dashboard");
       }, 1500);
@@ -70,44 +66,28 @@ const CustomerLogin = () => {
   };
 
   return (
-    <div
-      className="
-        flex overflow-hidden
-        min-h-screen
-        px-4
-        bg-linear-to-b from-white via-blue-50 to-blue-100 bg-[radial-gradient(#c1c1c1_1px,transparent_1px)] bg-size-[18px_18px]
-        relative items-center justify-center
-        sm:px-6
-        md:px-10
-      "
-    >
-      {/* Background Blobs */}
+    <div className="flex overflow-hidden min-h-screen px-4 bg-linear-to-b from-white via-blue-50 to-blue-100 bg-[radial-gradient(#c1c1c1_1px,transparent_1px)] bg-size-[18px_18px] relative items-center justify-center sm:px-6 md:px-10">
+
       <div className="w-48 h-48 bg-blue-300/30 rounded-full absolute top-10 left-5 blur-[100px] float -z-10 sm:w-64 sm:h-64 sm:left-10 md:w-72 md:h-72"></div>
       <div className="w-48 h-48 bg-purple-300/30 rounded-full absolute bottom-10 right-5 blur-[100px] float -z-10 sm:w-64 sm:h-64 sm:right-10 md:w-72 md:h-72"></div>
 
-      {/* Toast Message */}
       {toast && (
         <div className="z-50 px-6 py-3 text-white text-sm bg-green-600 rounded-lg shadow-lg fixed top-4 left-1/2 -translate-x-1/2 fade-in sm:text-base">
           {toast}
         </div>
       )}
-
-      {/* Error Message */}
       {error && (
         <div className="z-50 px-6 py-3 text-white text-sm bg-red-600 rounded-lg shadow-lg fixed top-4 left-1/2 -translate-x-1/2 fade-in sm:text-base">
           {error}
         </div>
       )}
 
-      {/* Login Card */}
       <div className="z-20 w-full max-w-md p-6 bg-white/70 border border-white/40 rounded-2xl shadow-2xl backdrop-blur-xl fade-in sm:p-8 md:max-w-lg md:p-10">
 
-        {/* Back Button */}
         <Link to="/" className="flex mb-4 text-blue-700 font-medium text-sm hover:text-blue-900 items-center gap-2 sm:text-base">
           ← Back to Home
         </Link>
 
-        {/* Logo + Heading */}
         <div className="flex flex-col mb-6 text-center items-center sm:mb-8">
           <div className="mb-3 text-4xl sm:text-5xl">🔐</div>
           <h1 className="text-2xl font-extrabold text-transparent bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text sm:text-3xl">
@@ -118,14 +98,9 @@ const CustomerLogin = () => {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleLogin} className="space-y-5 sm:space-y-6">
-
-          {/* Email */}
           <div>
-            <label className="text-gray-700 text-sm font-medium sm:text-base">
-              Email
-            </label>
+            <label className="text-gray-700 text-sm font-medium sm:text-base">Email</label>
             <input
               type="email"
               placeholder="Enter your email"
@@ -135,11 +110,8 @@ const CustomerLogin = () => {
             />
           </div>
 
-          {/* Password */}
           <div>
-            <label className="text-gray-700 text-sm font-medium sm:text-base">
-              Password
-            </label>
+            <label className="text-gray-700 text-sm font-medium sm:text-base">Password</label>
             <div className="relative">
               <input
                 type={showPass ? "text" : "password"}
@@ -148,43 +120,27 @@ const CustomerLogin = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-2.5 mt-1 text-sm bg-white/80 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none sm:p-3 sm:text-base"
               />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
-                className="text-gray-600 text-lg absolute right-3 top-1/2 -translate-y-1/2"
-              >
+              <button type="button" onClick={() => setShowPass(!showPass)} className="text-gray-600 text-lg absolute right-3 top-1/2 -translate-y-1/2">
                 {showPass ? "🙈" : "👁️"}
               </button>
             </div>
           </div>
 
-          {/* Forgot Password */}
           <div className="flex justify-end">
-            <button
-              type="button"
-              className="text-sm text-blue-600 hover:text-blue-800 underline sm:text-base"
-            >
+            <button type="button" className="text-sm text-blue-600 hover:text-blue-800 underline sm:text-base">
               Forgot Password?
             </button>
           </div>
 
-          {/* Login Button */}
           <button
             type="submit"
             disabled={loading}
-            className="
-              w-full py-2.5 text-white font-semibold text-sm
-              bg-blue-600 rounded-lg transition-all
-              hover:bg-blue-700 duration-300 hover:scale-[1.03]
-              disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100
-              sm:py-3 sm:text-base
-            "
+            className="w-full py-2.5 text-white font-semibold text-sm bg-blue-600 rounded-lg transition-all hover:bg-blue-700 duration-300 hover:scale-[1.03] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 sm:py-3 sm:text-base"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        {/* Register Link */}
         <p className="mt-6 text-gray-600 text-center text-sm sm:text-base">
           Don't have an account?
           <Link to="/customer/register" className="ml-1 text-blue-600 font-medium underline hover:text-blue-800">

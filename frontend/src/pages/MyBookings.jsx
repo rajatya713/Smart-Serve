@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const statusColors = {
     pending: "bg-yellow-100 text-yellow-700",
     confirmed: "bg-blue-100 text-blue-700",
@@ -33,7 +35,7 @@ const MyBookings = () => {
 
     const fetchBookings = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/bookings/user", {
+            const res = await fetch(`${API_URL}/api/bookings/user`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await res.json();
@@ -50,20 +52,14 @@ const MyBookings = () => {
         if (!window.confirm("Are you sure you want to cancel this booking?")) return;
         setCancellingId(bookingId);
         try {
-            const res = await fetch(
-                `http://localhost:5000/api/bookings/${bookingId}/cancel`,
-                {
-                    method: "PATCH",
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            const res = await fetch(`${API_URL}/api/bookings/${bookingId}/cancel`, {
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}` },
+            });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
-            // Update local state
             setBookings((prev) =>
-                prev.map((b) =>
-                    b._id === bookingId ? { ...b, status: "cancelled" } : b
-                )
+                prev.map((b) => b._id === bookingId ? { ...b, status: "cancelled" } : b)
             );
         } catch (err) {
             alert(err.message || "Failed to cancel booking.");
@@ -73,22 +69,14 @@ const MyBookings = () => {
     };
 
     const formatDate = (d) =>
-        d
-            ? new Date(d).toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-            })
-            : "—";
+        d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
     return (
         <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 bg-[radial-gradient(#c1c1c1_1px,transparent_1px)] bg-size-[18px_18px] px-4 py-10 sm:px-6 md:px-10">
 
-            {/* Blobs */}
             <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10"></div>
             <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10"></div>
 
-            {/* Header */}
             <div className="max-w-5xl mx-auto flex items-center justify-between mb-10">
                 <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
                     <img src="/logo.png" alt="Logo" className="h-9 w-auto drop-shadow" />
@@ -126,31 +114,17 @@ const MyBookings = () => {
                 ) : (
                     <div className="space-y-5">
                         {bookings.map((booking) => (
-                            <div
-                                key={booking._id}
-                                className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg p-6 fade-in"
-                            >
+                            <div key={booking._id} className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg p-6 fade-in">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-
-                                    {/* Left: Vehicle Info */}
                                     <div className="flex items-center gap-4">
                                         <div className="h-14 w-14 bg-blue-100 rounded-xl flex items-center justify-center text-3xl shrink-0">
-                                            {booking.vehicle?.type?.toLowerCase() === "bike" ||
-                                                booking.vehicle?.type?.toLowerCase() === "scooter"
-                                                ? "🏍️"
-                                                : "🚗"}
+                                            {booking.vehicle?.type?.toLowerCase() === "bike" || booking.vehicle?.type?.toLowerCase() === "scooter" ? "🏍️" : "🚗"}
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-gray-800 text-lg">
-                                                {booking.vehicle?.name || "Vehicle"}
-                                            </h3>
-                                            <p className="text-sm text-gray-500">
-                                                {booking.agency?.name || "Agency"} — {booking.location}
-                                            </p>
+                                            <h3 className="font-bold text-gray-800 text-lg">{booking.vehicle?.name || "Vehicle"}</h3>
+                                            <p className="text-sm text-gray-500">{booking.agency?.name || "Agency"} — {booking.location}</p>
                                         </div>
                                     </div>
-
-                                    {/* Right: Status Badges */}
                                     <div className="flex flex-wrap gap-2 items-center">
                                         <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${statusColors[booking.status]}`}>
                                             {booking.status}
@@ -161,7 +135,6 @@ const MyBookings = () => {
                                     </div>
                                 </div>
 
-                                {/* Details Row */}
                                 <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                                     <div>
                                         <p className="text-xs text-gray-400 uppercase font-medium">Pickup</p>
@@ -181,7 +154,6 @@ const MyBookings = () => {
                                     </div>
                                 </div>
 
-                                {/* Cancel Button */}
                                 {booking.status === "pending" && (
                                     <div className="mt-4 flex justify-end">
                                         <button

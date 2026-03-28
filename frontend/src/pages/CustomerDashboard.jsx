@@ -6,11 +6,9 @@ const CustomerDashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Read user from localStorage (saved at login/register)
         const savedUser = localStorage.getItem("user");
         const token = localStorage.getItem("token");
 
-        // If no token, redirect to login
         if (!token || !savedUser) {
             navigate("/customer/login");
             return;
@@ -25,12 +23,11 @@ const CustomerDashboard = () => {
         navigate("/customer/login");
     };
 
-    if (!user) return null; // Waiting for auth check
+    if (!user) return null;
 
     return (
         <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 bg-[radial-gradient(#c1c1c1_1px,transparent_1px)] bg-size-[18px_18px] px-4 py-10 sm:px-6 md:px-10 lg:px-14 xl:px-20">
 
-            {/* Background Blobs */}
             <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10"></div>
             <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10"></div>
 
@@ -50,11 +47,11 @@ const CustomerDashboard = () => {
                 </button>
             </div>
 
-            {/* Welcome Card */}
             <div className="max-w-5xl mx-auto">
+
+                {/* Welcome Card */}
                 <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl p-8 mb-8 fade-in">
                     <div className="flex items-center gap-5">
-                        {/* Avatar */}
                         <div className="h-16 w-16 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                             {user.name.charAt(0).toUpperCase()}
                         </div>
@@ -74,7 +71,11 @@ const CustomerDashboard = () => {
                 <h2 className="text-lg font-bold text-gray-700 mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
 
-                    <div className="group bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer">
+                    {/* Browse Vehicles — now navigates */}
+                    <div
+                        onClick={() => navigate("/vehicles")}
+                        className="group bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer"
+                    >
                         <div className="h-12 w-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-4 shadow">
                             🚗
                         </div>
@@ -82,7 +83,11 @@ const CustomerDashboard = () => {
                         <p className="text-gray-500 text-sm">Find the perfect ride for your journey.</p>
                     </div>
 
-                    <div className="group bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer">
+                    {/* My Bookings — now navigates */}
+                    <div
+                        onClick={() => navigate("/customer/bookings")}
+                        className="group bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer"
+                    >
                         <div className="h-12 w-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl mb-4 shadow">
                             📋
                         </div>
@@ -90,6 +95,7 @@ const CustomerDashboard = () => {
                         <p className="text-gray-500 text-sm">View and manage your current bookings.</p>
                     </div>
 
+                    {/* My Profile — placeholder for future */}
                     <div className="group bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer">
                         <div className="h-12 w-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-2xl mb-4 shadow">
                             👤

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const VehiclesPage = () => {
     const [vehicles, setVehicles] = useState([]);
     const [filtered, setFiltered] = useState([]);
@@ -15,7 +17,7 @@ const VehiclesPage = () => {
     useEffect(() => {
         const fetchVehicles = async () => {
             try {
-                const res = await fetch("http://localhost:5000/api/vehicles");
+                const res = await fetch(`${API_URL}/api/vehicles`);
                 const data = await res.json();
                 setVehicles(data);
                 setFiltered(data);
@@ -28,7 +30,6 @@ const VehiclesPage = () => {
         fetchVehicles();
     }, []);
 
-    // Apply filters whenever inputs change
     useEffect(() => {
         let result = vehicles;
 
@@ -54,11 +55,9 @@ const VehiclesPage = () => {
     return (
         <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 bg-[radial-gradient(#c1c1c1_1px,transparent_1px)] bg-size-[18px_18px] px-4 py-10 sm:px-6 md:px-10">
 
-            {/* Blobs */}
             <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10"></div>
             <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10"></div>
 
-            {/* Header */}
             <div className="max-w-6xl mx-auto flex items-center justify-between mb-10">
                 <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
                     <img src="/logo.png" alt="Logo" className="h-9 w-auto drop-shadow" />
@@ -75,14 +74,10 @@ const VehiclesPage = () => {
             </div>
 
             <div className="max-w-6xl mx-auto">
-                {/* Page Title */}
                 <h1 className="text-3xl font-extrabold text-gray-800 mb-2">Browse Vehicles</h1>
                 <p className="text-gray-500 mb-8">Find the perfect ride for your journey.</p>
 
-                {/* Filters */}
                 <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg p-6 mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:flex-wrap">
-
-                    {/* Search */}
                     <div className="flex-1 min-w-[180px]">
                         <label className="text-sm font-medium text-gray-700 block mb-1">Search</label>
                         <input
@@ -94,7 +89,6 @@ const VehiclesPage = () => {
                         />
                     </div>
 
-                    {/* Type Filter */}
                     <div>
                         <label className="text-sm font-medium text-gray-700 block mb-1">Type</label>
                         <div className="flex gap-2 flex-wrap">
@@ -113,7 +107,6 @@ const VehiclesPage = () => {
                         </div>
                     </div>
 
-                    {/* Price Filter */}
                     <div className="flex-1 min-w-[200px]">
                         <label className="text-sm font-medium text-gray-700 block mb-1">
                             Max Price: <span className="text-blue-600 font-semibold">₹{maxPrice}/day</span>
@@ -130,7 +123,6 @@ const VehiclesPage = () => {
                     </div>
                 </div>
 
-                {/* Results */}
                 {loading ? (
                     <div className="text-center py-20 text-gray-500 text-lg">Loading vehicles...</div>
                 ) : error ? (
@@ -145,11 +137,9 @@ const VehiclesPage = () => {
                                 className="group bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all overflow-hidden cursor-pointer"
                                 onClick={() => navigate(`/vehicles/${vehicle._id}`)}
                             >
-                                {/* Vehicle Icon Banner */}
                                 <div className="bg-linear-to-r from-blue-100 to-purple-100 h-36 flex items-center justify-center text-7xl">
                                     {vehicle.type?.toLowerCase() === "bike" || vehicle.type?.toLowerCase() === "scooter"
-                                        ? "🏍️"
-                                        : "🚗"}
+                                        ? "🏍️" : "🚗"}
                                 </div>
 
                                 <div className="p-5">
@@ -157,9 +147,7 @@ const VehiclesPage = () => {
                                         <h3 className="font-bold text-gray-800 text-lg group-hover:text-blue-600 transition">
                                             {vehicle.name}
                                         </h3>
-                                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${vehicle.available
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-red-100 text-red-600"
+                                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${vehicle.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
                                             }`}>
                                             {vehicle.available ? "Available" : "Unavailable"}
                                         </span>
