@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js";
 import agencyRoutes from "./routes/agencyRoutes.js";
 import vehicleRoutes from "./routes/vehicleRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -17,9 +18,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/agencies", agencyRoutes);
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/payments", paymentRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Smart Server backend running");
+  res.send("SmartServe backend running");
 });
 
 const PORT = process.env.PORT || 5000;
