@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import dotenv from "dotenv";
+dotenv.config();
+
+const apiUrl = process.env.VITE_API_BASE_URL;
 
 const CustomerLogin = () => {
   const [email, setEmail] = useState("");
@@ -29,7 +33,7 @@ const CustomerLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/login", {
+      const response = await fetch(`${apiUrl}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

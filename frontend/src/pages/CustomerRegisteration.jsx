@@ -217,6 +217,9 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import dotenv from "dotenv";
+dotenv.config();
+const apiUrl = process.env.VITE_API_BASE_URL;
 
 const CustomerRegister = () => {
     const [name, setName] = useState("");
@@ -256,7 +259,7 @@ const CustomerRegister = () => {
         setLoading(true);
 
         try {
-            const response = await fetch("http://localhost:5000/api/users/register", {
+            const response = await fetch(`${apiUrl}/api/users/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name, email, password: pass, role: "customer" }),
