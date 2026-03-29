@@ -53,13 +53,13 @@ const VehiclesPage = () => {
     const types = ["All", "Car", "Bike", "SUV", "Scooter"];
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 bg-[radial-gradient(#c1c1c1_1px,transparent_1px)] bg-size-[18px_18px] px-4 py-10 sm:px-6 md:px-10">
+        <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 bg-[radial-gradient(#c1c1c1_1px,transparent_1px)] bg-size-[18px_18px] px-4 py-10 sm:px-6 md:px-10 lg:px-14 xl:px-20">
 
             <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10"></div>
             <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10"></div>
 
-            <div className="max-w-6xl mx-auto flex items-center justify-between mb-10">
-                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
+            <div className="max-w-7xl mx-auto flex items-center justify-between mb-10">
+                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/customer/dashboard")}>
                     <img src="/logo.png" alt="Logo" className="h-9 w-auto drop-shadow" />
                     <span className="text-2xl font-extrabold text-transparent bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text">
                         SmartServe
@@ -67,13 +67,13 @@ const VehiclesPage = () => {
                 </div>
                 <button
                     onClick={() => navigate("/customer/dashboard")}
-                    className="text-sm font-medium text-blue-600 hover:text-blue-800 underline"
+                    className="text-sm font-medium text-blue-600 hover:text-blue-800 underline cursor-pointer hover:scale-102"
                 >
                     ← Dashboard
                 </button>
             </div>
 
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 <h1 className="text-3xl font-extrabold text-gray-800 mb-2">Browse Vehicles</h1>
                 <p className="text-gray-500 mb-8">Find the perfect ride for your journey.</p>
 
@@ -98,7 +98,7 @@ const VehiclesPage = () => {
                                     onClick={() => setTypeFilter(t)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${typeFilter === t
                                         ? "bg-blue-600 text-white border-blue-600"
-                                        : "bg-white text-gray-600 border-gray-300 hover:border-blue-400"
+                                        : "bg-white text-gray-600 border-gray-300 hover:border-blue-400 cursor-pointer"
                                         }`}
                                 >
                                     {t}

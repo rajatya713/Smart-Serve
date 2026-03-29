@@ -11,13 +11,14 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 dotenv.config();
 const app = express();
 connectDB();
-app.use(
-  cors({
-    origin: "https://smart-serve-frontend-one.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    credentials: true, // Important if login sets cookies!
-  }),
-);
+// app.use(
+//   cors({
+//     origin: "https://smart-serve-frontend-one.vercel.app",
+//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+//     credentials: true, // Important if login sets cookies!
+//   }),
+// );
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", userRoutes);

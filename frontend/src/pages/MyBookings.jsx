@@ -77,8 +77,8 @@ const MyBookings = () => {
             <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10"></div>
             <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10"></div>
 
-            <div className="max-w-5xl mx-auto flex items-center justify-between mb-10">
-                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
+            <div className="max-w-7xl mx-auto flex items-center justify-between mb-10">
+                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/customer/dashboard")}>
                     <img src="/logo.png" alt="Logo" className="h-9 w-auto drop-shadow" />
                     <span className="text-2xl font-extrabold text-transparent bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text">
                         SmartServe
@@ -86,13 +86,13 @@ const MyBookings = () => {
                 </div>
                 <button
                     onClick={() => navigate("/customer/dashboard")}
-                    className="text-sm font-medium text-blue-600 hover:text-blue-800 underline"
+                    className="text-sm font-medium text-blue-600 hover:text-blue-800 underline cursor-pointer hover:scale-102"
                 >
                     ← Dashboard
                 </button>
             </div>
 
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-6xl mx-auto">
                 <h1 className="text-3xl font-extrabold text-gray-800 mb-2">My Bookings</h1>
                 <p className="text-gray-500 mb-8">All your past and active vehicle bookings.</p>
 
@@ -159,7 +159,7 @@ const MyBookings = () => {
                                         <button
                                             onClick={() => handleCancel(booking._id)}
                                             disabled={cancellingId === booking._id}
-                                            className="px-4 py-2 text-sm font-semibold text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition disabled:opacity-50"
+                                            className="px-4 py-2 text-sm font-semibold text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition disabled:opacity-50 cursor-pointer"
                                         >
                                             {cancellingId === booking._id ? "Cancelling..." : "Cancel Booking"}
                                         </button>

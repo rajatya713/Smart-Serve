@@ -119,8 +119,8 @@ const PaymentPage = () => {
             <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10"></div>
             <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10"></div>
 
-            <div className="max-w-lg mx-auto flex items-center justify-between mb-10">
-                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
+            <div className="max-w-7xl mx-auto flex items-center justify-between mb-10">
+                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(-1)}>
                     <img src="/logo.png" alt="Logo" className="h-9 w-auto drop-shadow" />
                     <span className="text-2xl font-extrabold text-transparent bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text">
                         SmartServe
@@ -169,7 +169,7 @@ const PaymentPage = () => {
                     <button
                         onClick={handlePayment}
                         disabled={loading}
-                        className="w-full py-4 rounded-xl text-white font-bold text-lg bg-blue-600 hover:bg-blue-700 transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-blue-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="w-full py-4 rounded-xl text-white font-bold text-lg bg-blue-600 hover:bg-blue-700 transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-blue-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
                     >
                         {loading ? "Processing..." : `Pay ₹${totalPrice} via Razorpay`}
                     </button>

@@ -10,6 +10,9 @@ import BookingPage from './pages/BookingPage'
 import PaymentPage from './pages/PaymentPage'
 import BookingConfirmation from './pages/BookingConfirmation'
 import MyBookings from './pages/MyBookings'
+import ProfilePage from './pages/ProfilePage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 function App() {
   const isHome = useLocation().pathname === '/'
@@ -21,10 +24,13 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path="/customer/login" element={<CustomerLogin />} />
         <Route path="/customer/register" element={<CustomerRegister />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
-        {/* Customer (protected by page-level redirect) */}
+        {/* Customer */}
         <Route path="/customer/dashboard" element={<CustomerDashboard />} />
         <Route path="/customer/bookings" element={<MyBookings />} />
+        <Route path="/customer/profile" element={<ProfilePage />} />
 
         {/* Vehicles */}
         <Route path="/vehicles" element={<VehiclesPage />} />
