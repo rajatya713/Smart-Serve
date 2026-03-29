@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -13,13 +14,12 @@ const VehicleDetail = () => {
     useEffect(() => {
         const fetchVehicle = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/vehicles`);
+                const res = await fetch(`${API_URL}/api/vehicles/${id}`);
+                if (!res.ok) throw new Error("Vehicle not found");
                 const data = await res.json();
-                const found = data.find((v) => v._id === id);
-                if (!found) setError("Vehicle not found.");
-                else setVehicle(found);
+                setVehicle(data);
             } catch {
-                setError("Failed to load vehicle.");
+                setError("Vehicle not found.");
             } finally {
                 setLoading(false);
             }
@@ -27,60 +27,61 @@ const VehicleDetail = () => {
         fetchVehicle();
     }, [id]);
 
-    if (loading)
-        return (
-            <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
-                Loading vehicle details...
-            </div>
-        );
+    useEffect(() => {
+        if (vehicle) {
+            document.title = `${vehicle.name} — SmartServe`;
+        }
+        return () => {
+            document.title = "SmartServe";
+        };
+    }, [vehicle]);
 
-    if (error)
+    if (loading) return <LoadingSpinner text="Loading vehicle..." />;
+
+    if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center text-red-500">
-                {error}
+            <div className="min-h-screen flex flex-col items-center justify-center page-bg text-gray-500 gap-4">
+                <div className="text-5xl">😔</div>
+                <p>{error}</p>
+                <Link to="/vehicles" className="text-blue-600 underline font-medium">
+                    Browse Vehicles
+                </Link>
             </div>
         );
+    }
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 bg-[radial-gradient(#c1c1c1_1px,transparent_1px)] bg-size-[18px_18px] px-4 py-10 sm:px-6 md:px-10">
-
-            <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10"></div>
-            <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10"></div>
-
-            <div className="max-w-7xl mx-auto flex items-center justify-between mb-10">
-                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/vehicles")}>
-                    <img src="/logo.png" alt="Logo" className="h-9 w-auto drop-shadow" />
-                    <span className="text-2xl font-extrabold text-transparent bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text">
-                        SmartServe
-                    </span>
-                </div>
-                <button
-                    onClick={() => navigate("/vehicles")}
-                    className="text-sm font-medium text-blue-600 hover:text-blue-800 underline cursor-pointer hover:scale-102"
-                >
-                    ← Back to Vehicles
-                </button>
-            </div>
+        <div className="page-bg px-4 py-10 sm:px-6 md:px-10 min-h-screen">
+            <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10" />
+            <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10" />
 
             <div className="max-w-6xl mx-auto">
-                <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl overflow-hidden fade-in">
-
+                <div className="glass-card overflow-hidden fade-in">
                     <div className="bg-linear-to-r from-blue-100 to-purple-100 h-52 flex items-center justify-center text-9xl">
                         {vehicle.type?.toLowerCase() === "bike" || vehicle.type?.toLowerCase() === "scooter"
-                            ? "🏍️" : "🚗"}
+                            ? "🏍️"
+                            : "🚗"}
                     </div>
 
                     <div className="p-8">
                         <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
                             <div>
                                 <h1 className="text-3xl font-extrabold text-gray-800">{vehicle.name}</h1>
-                                <p className="text-gray-500 mt-1">{vehicle.agency?.name} — {vehicle.agency?.location}</p>
+                                <p className="text-gray-500 mt-1">
+                                    {vehicle.agency?.name} — {vehicle.agency?.location}
+                                </p>
                             </div>
-                            <span className={`px-4 py-1.5 rounded-full text-sm font-semibold ${vehicle.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
-                                }`}>
+                            <span
+                                className={`px-4 py-1.5 rounded-full text-sm font-semibold ${vehicle.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
+                                    }`}
+                            >
                                 {vehicle.available ? "✅ Available" : "❌ Unavailable"}
                             </span>
                         </div>
+
+                        {vehicle.description && (
+                            <p className="text-gray-600 mb-6">{vehicle.description}</p>
+                        )}
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mb-8">
                             <div className="bg-blue-50 rounded-xl p-4 text-center">
@@ -97,16 +98,31 @@ const VehicleDetail = () => {
                             </div>
                         </div>
 
+                        {vehicle.features?.length > 0 && (
+                            <div className="mb-8">
+                                <h3 className="font-bold text-gray-800 mb-3">Features</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {vehicle.features.map((f, i) => (
+                                        <span key={i} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                                            {f}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {vehicle.agency?.contact && (
                             <div className="flex items-center gap-3 mb-8 text-gray-600">
                                 <span className="text-xl">📞</span>
-                                <span className="text-sm">Agency Contact: <strong>{vehicle.agency.contact}</strong></span>
+                                <span className="text-sm">
+                                    Agency Contact: <strong>{vehicle.agency.contact}</strong>
+                                </span>
                             </div>
                         )}
 
                         <button
                             disabled={!vehicle.available}
-                            onClick={() => navigate(`/booking/${vehicle._id}`, { state: { vehicle } })}
+                            onClick={() => navigate(`/booking/${vehicle._id}`)}
                             className="w-full py-4 rounded-xl text-white font-bold text-lg bg-blue-600 hover:bg-blue-700 transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
                         >
                             {vehicle.available ? "🚀 Book Now" : "Currently Unavailable"}

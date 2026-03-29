@@ -1,16 +1,23 @@
 import express from "express";
 import {
   createAgency,
+  getMyAgency,
+  updateAgency,
   getAllAgencies,
   getAgencyById,
+  getAgencyStats,
+  getAgencyBookings,
 } from "../controllers/agencyController.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Admin or agency only
-router.post("/", protect, createAgency); // Create agency
-router.get("/", getAllAgencies); // Get all agencies
-router.get("/:id", getAgencyById); // Get single agency
+router.get("/", getAllAgencies);
+router.get("/me", protect, authorize("agency"), getMyAgency);
+router.get("/stats", protect, authorize("agency"), getAgencyStats);
+router.get("/bookings", protect, authorize("agency"), getAgencyBookings);
+router.post("/", protect, authorize("agency"), createAgency);
+router.put("/me", protect, authorize("agency"), updateAgency);
+router.get("/:id", getAgencyById);
 
 export default router;

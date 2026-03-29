@@ -1,39 +1,54 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 const PaymentPage = () => {
-    const location = useLocation();
+    const { bookingId } = useParams();
     const navigate = useNavigate();
-    const { booking, vehicle, totalPrice } = location.state || {};
+    const { token, user } = useAuth();
+
+    const [booking, setBooking] = useState(null);
+    const [pageLoading, setPageLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
+    // Load Razorpay script
     useEffect(() => {
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.async = true;
+        script.onload = () => setRazorpayLoaded(true);
+        script.onerror = () => setError("Failed to load payment gateway. Refresh the page.");
         document.body.appendChild(script);
         return () => document.body.removeChild(script);
     }, []);
 
-    if (!booking || !vehicle) {
-        return (
-            <div className="min-h-screen flex items-center justify-center text-gray-500">
-                Payment data missing.{" "}
-                <button className="ml-2 text-blue-600 underline" onClick={() => navigate("/vehicles")}>
-                    Go to Vehicles
-                </button>
-            </div>
-        );
-    }
+    // Fetch booking details
+    useEffect(() => {
+        const fetchBooking = async () => {
+            try {
+                const res = await fetch(`${API_URL}/api/bookings/${bookingId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) throw new Error("Booking not found");
+                const data = await res.json();
+                setBooking(data);
+            } catch {
+                setError("Booking not found.");
+            } finally {
+                setPageLoading(false);
+            }
+        };
+        fetchBooking();
+    }, [bookingId, token]);
 
     const handlePayment = async () => {
         setError("");
         setLoading(true);
-        const token = localStorage.getItem("token");
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
 
         try {
             const orderRes = await fetch(`${API_URL}/api/payments/create-order`, {
@@ -47,7 +62,7 @@ const PaymentPage = () => {
 
             const orderData = await orderRes.json();
             if (!orderRes.ok) {
-                setError(orderData.message || "Failed to create payment order.");
+                setError(orderData.message || "Failed to create order.");
                 setLoading(false);
                 return;
             }
@@ -57,9 +72,9 @@ const PaymentPage = () => {
                 amount: orderData.amount,
                 currency: orderData.currency,
                 name: "SmartServe",
-                description: `Booking for ${vehicle.name}`,
+                description: `Booking for ${booking.vehicle?.name}`,
                 order_id: orderData.orderId,
-                prefill: { name: user.name || "", email: user.email || "" },
+                prefill: { name: user?.name || "", email: user?.email || "" },
                 theme: { color: "#2563eb" },
 
                 handler: async (response) => {
@@ -82,81 +97,104 @@ const PaymentPage = () => {
 
                         if (!verifyRes.ok) {
                             setError("Payment verification failed. Contact support.");
+                            setLoading(false);
                             return;
                         }
 
-                        navigate("/booking/confirmation", {
-                            state: {
-                                booking: verifyData.booking,
-                                vehicle,
-                                paymentId: response.razorpay_payment_id,
-                            },
-                        });
+                        navigate(`/booking/confirmation/${booking._id}`);
                     } catch {
-                        setError("Verification error. Please contact support.");
+                        setError("Verification error. Contact support.");
+                        setLoading(false);
                     }
                 },
 
-                modal: { ondismiss: () => setLoading(false) },
+                modal: {
+                    ondismiss: () => setLoading(false),
+                },
             };
 
             const rzp = new window.Razorpay(options);
+            rzp.on("payment.failed", (response) => {
+                setError(`Payment failed: ${response.error.description}`);
+                setLoading(false);
+            });
             rzp.open();
-
         } catch {
-            setError("Something went wrong. Please try again.");
-        } finally {
+            setError("Something went wrong.");
             setLoading(false);
         }
     };
 
     const formatDate = (d) =>
-        d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
+        d
+            ? new Date(d).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+            })
+            : "—";
+
+    if (pageLoading) return <LoadingSpinner text="Loading payment details..." />;
+
+    if (!booking) {
+        return (
+            <div className="min-h-screen flex items-center justify-center text-gray-500 page-bg">
+                Booking not found.{" "}
+                <button className="ml-2 text-blue-600 underline" onClick={() => navigate("/vehicles")}>
+                    Go to Vehicles
+                </button>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-white via-blue-50 to-blue-100 bg-[radial-gradient(#c1c1c1_1px,transparent_1px)] bg-size-[18px_18px] px-4 py-10 sm:px-6 md:px-10">
-
-            <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10"></div>
-            <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10"></div>
-
-            <div className="max-w-7xl mx-auto flex items-center justify-between mb-10">
-                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(-1)}>
-                    <img src="/logo.png" alt="Logo" className="h-9 w-auto drop-shadow" />
-                    <span className="text-2xl font-extrabold text-transparent bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text">
-                        SmartServe
-                    </span>
-                </div>
-            </div>
+        <div className="page-bg px-4 py-10 sm:px-6 md:px-10 min-h-screen">
+            <div className="w-64 h-64 bg-blue-300/30 rounded-full fixed top-10 left-5 blur-[120px] -z-10" />
+            <div className="w-64 h-64 bg-purple-300/30 rounded-full fixed bottom-10 right-5 blur-[120px] -z-10" />
 
             <div className="max-w-lg mx-auto">
-                <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl p-8 fade-in">
+                <div className="glass-card p-8 fade-in">
                     <div className="text-center mb-6">
                         <div className="text-5xl mb-3">💳</div>
                         <h1 className="text-2xl font-extrabold text-gray-800">Complete Payment</h1>
-                        <p className="text-gray-500 text-sm mt-1">Review your booking and pay securely via Razorpay</p>
+                        <p className="text-gray-500 text-sm mt-1">Review your booking and pay securely</p>
                     </div>
 
                     <div className="bg-blue-50 rounded-xl p-5 mb-6 space-y-3 text-sm">
                         <h3 className="font-bold text-gray-700 mb-3">Order Summary</h3>
-                        <div className="flex justify-between text-gray-600">
-                            <span>Vehicle</span><span className="font-medium text-gray-800">{vehicle.name}</span>
-                        </div>
-                        <div className="flex justify-between text-gray-600">
-                            <span>Pickup</span><span className="font-medium text-gray-800">{formatDate(booking.pickupDate)}</span>
-                        </div>
-                        <div className="flex justify-between text-gray-600">
-                            <span>Drop-off</span><span className="font-medium text-gray-800">{formatDate(booking.dropoffDate)}</span>
-                        </div>
-                        <div className="flex justify-between text-gray-600">
-                            <span>Location</span><span className="font-medium text-gray-800">{booking.location || "—"}</span>
-                        </div>
-                        <div className="flex justify-between text-gray-600">
-                            <span>Delivery</span><span className="font-medium text-gray-800">{booking.deliveryRequired ? "Yes" : "No"}</span>
-                        </div>
-                        <div className="h-px bg-blue-200 my-1"></div>
+                        {[
+                            { label: "Vehicle", value: booking.vehicle?.name },
+                            { label: "Pickup", value: formatDate(booking.pickupDate) },
+                            { label: "Drop-off", value: formatDate(booking.dropoffDate) },
+                            { label: "Location", value: booking.location },
+                            { label: "Delivery", value: booking.deliveryRequired ? "Yes (Doorstep)" : "No" },
+                        ].map((item, i) => (
+                            <div key={i} className="flex justify-between text-gray-600">
+                                <span>{item.label}</span>
+                                <span className="font-medium text-gray-800">{item.value || "—"}</span>
+                            </div>
+                        ))}
+
+                        {booking.deliveryRequired && booking.deliveryAddress && (
+                            <div className="flex justify-between text-gray-600">
+                                <span>Delivery Address</span>
+                                <span className="font-medium text-gray-800 text-right max-w-[200px]">
+                                    {booking.deliveryAddress}
+                                </span>
+                            </div>
+                        )}
+
+                        {booking.deliveryFee > 0 && (
+                            <div className="flex justify-between text-gray-600">
+                                <span>Delivery Fee</span>
+                                <span className="font-medium text-gray-800">₹{booking.deliveryFee}</span>
+                            </div>
+                        )}
+
+                        <div className="h-px bg-blue-200 my-1" />
                         <div className="flex justify-between font-bold text-base">
                             <span>Total Amount</span>
-                            <span className="text-blue-600 text-xl">₹{totalPrice}</span>
+                            <span className="text-blue-600 text-xl">₹{booking.totalPrice}</span>
                         </div>
                     </div>
 
@@ -168,10 +206,14 @@ const PaymentPage = () => {
 
                     <button
                         onClick={handlePayment}
-                        disabled={loading}
+                        disabled={loading || !razorpayLoaded}
                         className="w-full py-4 rounded-xl text-white font-bold text-lg bg-blue-600 hover:bg-blue-700 transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-blue-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
                     >
-                        {loading ? "Processing..." : `Pay ₹${totalPrice} via Razorpay`}
+                        {!razorpayLoaded
+                            ? "Loading payment gateway..."
+                            : loading
+                                ? "Processing..."
+                                : `Pay ₹${booking.totalPrice} via Razorpay`}
                     </button>
 
                     <p className="text-center text-xs text-gray-400 mt-4">

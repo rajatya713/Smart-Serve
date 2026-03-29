@@ -1,10 +1,10 @@
 import crypto from "crypto";
 import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import { Resend } from "resend";
 import dotenv from "dotenv";
 dotenv.config();
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const generateToken = (id) => {
@@ -13,15 +13,41 @@ const generateToken = (id) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-    const existingUser = await User.findOne({ email });
-    if (existingUser)
+    const { name, email, password, phone, role } = req.body;
+
+    if (!name || !email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Name, email and password are required" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
+    }
+
+    const allowedRoles = ["customer", "agency", "delivery"];
+    const userRole = allowedRoles.includes(role) ? role : "customer";
+
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
-    const user = await User.create({ name, email, password, role });
+    }
+
+    const user = await User.create({
+      name,
+      email: email.toLowerCase(),
+      password,
+      phone: phone || "",
+      role: userRole,
+    });
+
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
       role: user.role,
       token: generateToken(user._id),
     });
@@ -33,15 +59,25 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
-    const isMatch = await bcrypt.compare(password, user.password);
+
+    const isMatch = await user.matchPassword(password);
     if (!isMatch)
       return res.status(400).json({ message: "Invalid credentials" });
+
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
       role: user.role,
       token: generateToken(user._id),
     });
@@ -64,31 +100,47 @@ export const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found" });
-    const { name, email, password, currentPassword } = req.body;
-    if (email && email !== user.email) {
-      const emailExists = await User.findOne({ email });
-      if (emailExists)
+
+    const { name, email, password, currentPassword, phone } = req.body;
+
+    if (email && email.toLowerCase() !== user.email) {
+      const emailExists = await User.findOne({ email: email.toLowerCase() });
+      if (emailExists) {
         return res.status(400).json({ message: "Email already in use" });
+      }
     }
+
     if (password) {
-      if (!currentPassword)
-        return res.status(400).json({
-          message: "Current password is required to set a new password",
-        });
-      const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch)
+      if (!currentPassword) {
+        return res
+          .status(400)
+          .json({ message: "Current password is required" });
+      }
+      const isMatch = await user.matchPassword(currentPassword);
+      if (!isMatch) {
         return res
           .status(400)
           .json({ message: "Current password is incorrect" });
+      }
+      if (password.length < 6) {
+        return res
+          .status(400)
+          .json({ message: "New password must be at least 6 characters" });
+      }
       user.password = password;
     }
+
     user.name = name || user.name;
-    user.email = email || user.email;
+    user.email = email ? email.toLowerCase() : user.email;
+    user.phone = phone !== undefined ? phone : user.phone;
+
     const updatedUser = await user.save();
+
     res.json({
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
+      phone: updatedUser.phone,
       role: updatedUser.role,
       token: generateToken(updatedUser._id),
     });
@@ -104,7 +156,7 @@ export const forgotPassword = async (req, res) => {
       return res.status(400).json({ message: "Please provide your email." });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.json({
         message: "If that email exists, a reset link has been sent.",
@@ -128,19 +180,14 @@ export const forgotPassword = async (req, res) => {
       to: user.email,
       subject: "SmartServe — Reset Your Password",
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #2563eb;">SmartServe Password Reset</h2>
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+          <h2 style="color:#2563eb;">SmartServe Password Reset</h2>
           <p>Hi <strong>${user.name}</strong>,</p>
-          <p>You requested to reset your password. Click the button below to set a new password.</p>
-          <p>This link will expire in <strong>1 hour</strong>.</p>
-          <a href="${resetUrl}"
-            style="display: inline-block; margin: 20px 0; padding: 14px 28px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            Reset My Password
-          </a>
-          <p style="color: #6b7280; font-size: 13px;">If you did not request this, please ignore this email.</p>
-          <p style="color: #6b7280; font-size: 13px;">Or copy this link: <a href="${resetUrl}">${resetUrl}</a></p>
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
-          <p style="color: #9ca3af; font-size: 12px;">© ${new Date().getFullYear()} SmartServe. All rights reserved.</p>
+          <p>Click the button below to reset your password. This link expires in <strong>1 hour</strong>.</p>
+          <a href="${resetUrl}" style="display:inline-block;margin:20px 0;padding:14px 28px;background:#2563eb;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Reset My Password</a>
+          <p style="color:#6b7280;font-size:13px;">Or copy: <a href="${resetUrl}">${resetUrl}</a></p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;"/>
+          <p style="color:#9ca3af;font-size:12px;">© ${new Date().getFullYear()} SmartServe</p>
         </div>
       `,
     });
@@ -148,7 +195,7 @@ export const forgotPassword = async (req, res) => {
     res.json({ message: "If that email exists, a reset link has been sent." });
   } catch (error) {
     await User.updateOne(
-      { email: req.body.email },
+      { email: req.body.email?.toLowerCase() },
       { resetPasswordToken: null, resetPasswordExpires: null },
     );
     res
@@ -162,10 +209,11 @@ export const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    if (!password || password.length < 6)
+    if (!password || password.length < 6) {
       return res
         .status(400)
         .json({ message: "Password must be at least 6 characters." });
+    }
 
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
@@ -174,10 +222,11 @@ export const resetPassword = async (req, res) => {
       resetPasswordExpires: { $gt: Date.now() },
     });
 
-    if (!user)
+    if (!user) {
       return res
         .status(400)
         .json({ message: "Reset link is invalid or has expired." });
+    }
 
     user.password = password;
     user.resetPasswordToken = null;

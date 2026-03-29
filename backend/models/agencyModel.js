@@ -2,12 +2,24 @@ import mongoose from "mongoose";
 
 const agencySchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, trim: true },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     location: { type: String, required: true },
     contact: { type: String, required: true },
-    vehicles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Vehicle" }],
+    description: { type: String, default: "" },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "suspended"],
+      default: "approved",
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+agencySchema.index({ owner: 1 });
 
 export default mongoose.model("Agency", agencySchema);

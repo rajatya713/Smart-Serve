@@ -1,7 +1,6 @@
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import Booking from "../models/bookingModel.js";
-
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -10,7 +9,6 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// Create Razorpay order for a booking
 export const createOrder = async (req, res) => {
   try {
     const { bookingId } = req.body;
@@ -18,7 +16,14 @@ export const createOrder = async (req, res) => {
     const booking = await Booking.findById(bookingId);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    // Amount in paise (Razorpay uses smallest currency unit)
+    if (booking.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    if (booking.paymentStatus === "paid") {
+      return res.status(400).json({ message: "Already paid" });
+    }
+
     const amount = booking.totalPrice * 100;
 
     const order = await razorpay.orders.create({
@@ -27,7 +32,6 @@ export const createOrder = async (req, res) => {
       receipt: `receipt_${bookingId}`,
     });
 
-    // Save razorpay order id to booking
     booking.razorpayOrderId = order.id;
     await booking.save();
 
@@ -42,7 +46,6 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// Verify Razorpay payment signature
 export const verifyPayment = async (req, res) => {
   try {
     const {
@@ -52,7 +55,6 @@ export const verifyPayment = async (req, res) => {
       bookingId,
     } = req.body;
 
-    // Generate expected signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
@@ -63,8 +65,10 @@ export const verifyPayment = async (req, res) => {
       return res.status(400).json({ message: "Payment verification failed" });
     }
 
-    // Update booking as paid
-    const booking = await Booking.findById(bookingId);
+    const booking = await Booking.findById(bookingId)
+      .populate("vehicle", "name type pricePerDay image")
+      .populate("agency", "name location");
+
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
     booking.paymentStatus = "paid";
