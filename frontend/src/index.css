@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* ✅ FIX: Prevent horizontal overflow from mobile menu */
+html, body, #root {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 /* Custom Animations */
 @keyframes slideUp {
   from {

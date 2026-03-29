@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { menu_icon, close_icon } from "../assets/assets";
 
 const AppNavbar = () => {
@@ -8,6 +8,19 @@ const AppNavbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [open, setOpen] = useState(false);
+
+    // Close menu on route change
+    useEffect(() => {
+        setOpen(false);
+    }, [location.pathname]);
+
+    // Lock body scroll when menu is open
+    useEffect(() => {
+        document.body.style.overflow = open ? "hidden" : "auto";
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, [open]);
 
     const handleLogout = () => {
         logout();
@@ -44,6 +57,7 @@ const AppNavbar = () => {
 
     return (
         <>
+            {/* Overlay */}
             {open && (
                 <div
                     className="fixed inset-0 bg-black/40 z-40 sm:hidden"
@@ -101,11 +115,13 @@ const AppNavbar = () => {
                         />
                     </button>
                 </div>
+            </nav>
 
-                {/* Mobile Menu */}
+            {/* ✅ FIX: Mobile Menu - wrapped in overflow-hidden container */}
+            <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden sm:hidden">
                 <div
-                    className={`fixed top-0 right-0 h-screen w-3/4 bg-white z-50 p-8 
-            transition-transform duration-300 sm:hidden shadow-2xl
+                    className={`absolute top-0 right-0 h-screen w-3/4 bg-white p-8 
+            transition-transform duration-300 shadow-2xl pointer-events-auto
             ${open ? "translate-x-0" : "translate-x-full"}`}
                 >
                     <button
@@ -136,13 +152,13 @@ const AppNavbar = () => {
                         </p>
                         <button
                             onClick={handleLogout}
-                            className="w-full py-2 bg-red-500 text-white rounded-lg font-medium"
+                            className="w-full py-2 bg-red-500 text-white rounded-lg font-medium cursor-pointer"
                         >
                             Logout
                         </button>
                     </div>
                 </div>
-            </nav>
+            </div>
         </>
     );
 };

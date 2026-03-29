@@ -104,7 +104,7 @@ const CustomerDashboard = () => {
                             <Link
                                 key={b._id}
                                 to={`/customer/bookings`}
-                                className="glass-card p-4 flex justify-between items-center hover:shadow-lg transition block"
+                                className="glass-card p-4 flex justify-between items-center hover:shadow-lg transition"
                             >
                                 <div>
                                     <p className="font-semibold text-gray-800">{b.vehicle?.name || "Vehicle"}</p>
