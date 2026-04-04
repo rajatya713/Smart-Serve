@@ -173,7 +173,7 @@ const VehiclesPage = () => {
                                             <img
                                                 src={vehicle.image}
                                                 alt={vehicle.name}
-                                                className="h-full object-cover"
+                                                className="h-full object-cover w-full"
                                             />
                                         ) : (
                                             <div className="h-full flex items-center justify-center text-4xl">

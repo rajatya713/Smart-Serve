@@ -58,9 +58,17 @@ const VehicleDetail = () => {
             <div className="max-w-6xl mx-auto">
                 <div className="glass-card overflow-hidden fade-in">
                     <div className="bg-linear-to-r from-blue-100 to-purple-100 h-52 flex items-center justify-center text-9xl">
-                        {vehicle.type?.toLowerCase() === "bike" || vehicle.type?.toLowerCase() === "scooter"
-                            ? "🏍️"
-                            : "🚗"}
+                        {vehicle.image ? (
+                            <img
+                                src={vehicle.image}
+                                alt={vehicle.name}
+                                className="h-full object-cover w-full"
+                            />
+                        ) : (
+                            <div className="h-full flex items-center justify-center text-4xl">
+                                {vehicle.type === "bike" || vehicle.type === "scooter" ? "🏍️" : "🚗"}
+                            </div>
+                        )}
                     </div>
 
                     <div className="p-8">
