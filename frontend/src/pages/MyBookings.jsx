@@ -84,8 +84,8 @@ const MyBookings = () => {
                                 key={f}
                                 onClick={() => setFilter(f)}
                                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition cursor-pointer ${filter === f
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-white/70 text-gray-600 hover:bg-blue-50 border border-gray-200"
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-white/70 text-gray-600 hover:bg-blue-50 border border-gray-200"
                                     }`}
                             >
                                 {f.charAt(0).toUpperCase() + f.slice(1).replace("-", " ")}
@@ -118,15 +118,15 @@ const MyBookings = () => {
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex items-center gap-4">
                                         <div className="h-14 w-14 bg-blue-100 rounded-xl flex items-center justify-center text-3xl shrink-0">
-                                            {vehicle.image ? (
+                                            {booking.vehicle?.image ? (
                                                 <img
-                                                    src={vehicle.image}
-                                                    alt={vehicle.name}
+                                                    src={booking.vehicle.image}
+                                                    alt={booking.vehicle.name}
                                                     className="h-full object-cover w-full"
                                                 />
                                             ) : (
                                                 <div className="h-full flex items-center justify-center text-4xl">
-                                                    {vehicle.type === "bike" || vehicle.type === "scooter" ? "🏍️" : "🚗"}
+                                                    {booking.vehicle.type === "bike" || booking.vehicle.type === "scooter" ? "🏍️" : "🚗"}
                                                 </div>
                                             )}
                                         </div>
