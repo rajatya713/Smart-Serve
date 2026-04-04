@@ -178,15 +178,15 @@ const DeliveryDashboard = () => {
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="h-12 w-12 bg-cyan-100 rounded-xl flex items-center justify-center text-2xl shrink-0">
-                                        {vehicle.image ? (
+                                        {d.vehicle?.image ? (
                                             <img
-                                                src={vehicle.image}
-                                                alt={vehicle.name}
+                                                src={d.vehicle.image}
+                                                alt={d.vehicle.name}
                                                 className="h-full object-cover w-full"
                                             />
                                         ) : (
                                             <div className="h-full flex items-center justify-center text-4xl">
-                                                {vehicle.type === "bike" || vehicle.type === "scooter" ? "🏍️" : "🚗"}
+                                                {d.vehicle.type === "bike" || d.vehicle.type === "scooter" ? "🏍️" : "🚗"}
                                             </div>
                                         )}
                                     </div>
