@@ -256,15 +256,15 @@ const DeliveryActive = () => {
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                                     <div className="flex items-center gap-4">
                                         <div className="h-14 w-14 bg-cyan-100 rounded-xl flex items-center justify-center text-3xl shrink-0">
-                                            {vehicle.image ? (
+                                            {delivery.vehicle?.image ? (
                                                 <img
-                                                    src={vehicle.image}
-                                                    alt={vehicle.name}
+                                                    src={delivery.vehicle.image}
+                                                    alt={delivery.vehicle.name}
                                                     className="h-full object-cover w-full"
                                                 />
                                             ) : (
                                                 <div className="h-full flex items-center justify-center text-4xl">
-                                                    {vehicle.type === "bike" || vehicle.type === "scooter" ? "🏍️" : "🚗"}
+                                                    {delivery.vehicle.type === "bike" || delivery.vehicle.type === "scooter" ? "🏍️" : "🚗"}
                                                 </div>
                                             )}
                                         </div>
