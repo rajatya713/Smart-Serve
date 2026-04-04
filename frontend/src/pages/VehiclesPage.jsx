@@ -103,8 +103,8 @@ const VehiclesPage = () => {
                                     key={t}
                                     onClick={() => setTypeFilter(t)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${typeFilter === t
-                                            ? "bg-blue-600 text-white border-blue-600"
-                                            : "bg-white text-gray-600 border-gray-300 hover:border-blue-400"
+                                        ? "bg-blue-600 text-white border-blue-600"
+                                        : "bg-white text-gray-600 border-gray-300 hover:border-blue-400"
                                         }`}
                                 >
                                     {t}
@@ -166,9 +166,20 @@ const VehiclesPage = () => {
                                     className="group glass-card hover:shadow-2xl hover:-translate-y-1 transition-all overflow-hidden block"
                                 >
                                     <div className="bg-linear-to-r from-blue-100 to-purple-100 h-36 flex items-center justify-center text-7xl">
-                                        {vehicle.type?.toLowerCase() === "bike" || vehicle.type?.toLowerCase() === "scooter"
+                                        {/* {vehicle.type?.toLowerCase() === "bike" || vehicle.type?.toLowerCase() === "scooter"
                                             ? "🏍️"
-                                            : "🚗"}
+                                            : "🚗"} */}
+                                        {vehicle.image ? (
+                                            <img
+                                                src={vehicle.image}
+                                                alt={vehicle.name}
+                                                className="h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="h-full flex items-center justify-center text-4xl">
+                                                {vehicle.type === "bike" || vehicle.type === "scooter" ? "🏍️" : "🚗"}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="p-5">
