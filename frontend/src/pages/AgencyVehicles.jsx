@@ -331,9 +331,17 @@ const AgencyVehicles = () => {
                         {vehicles.map((v) => (
                             <div key={v._id} className="glass-card overflow-hidden">
                                 <div className="bg-linear-to-r from-blue-100 to-purple-100 h-32 flex items-center justify-center text-6xl">
-                                    {v.type?.toLowerCase() === "bike" || v.type?.toLowerCase() === "scooter"
-                                        ? "🏍️"
-                                        : "🚗"}
+                                    {v.image ? (
+                                        <img
+                                            src={v.image}
+                                            alt={v.name}
+                                            className="h-full object-cover w-full"
+                                        />
+                                    ) : (
+                                        <div className="h-full flex items-center justify-center text-4xl">
+                                            {v.type === "bike" || v.type === "scooter" ? "🏍️" : "🚗"}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="p-5">
                                     <div className="flex justify-between items-start mb-2">

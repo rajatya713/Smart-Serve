@@ -309,7 +309,17 @@ const BookingPage = () => {
                     <div className="md:col-span-2 glass-card p-6 h-fit fade-in">
                         <h3 className="font-bold text-gray-800 mb-4 text-lg">Booking Summary</h3>
                         <div className="text-6xl text-center mb-4">
-                            {vehicle.type?.toLowerCase() === "bike" || vehicle.type?.toLowerCase() === "scooter" ? "🏍️" : "🚗"}
+                            {vehicle.image ? (
+                                <img
+                                    src={vehicle.image}
+                                    alt={vehicle.name}
+                                    className="h-full object-cover w-full"
+                                />
+                            ) : (
+                                <div className="h-full flex items-center justify-center text-4xl">
+                                    {vehicle.type === "bike" || vehicle.type === "scooter" ? "🏍️" : "🚗"}
+                                </div>
+                            )}
                         </div>
                         <p className="font-semibold text-gray-800 text-center mb-4">{vehicle.name}</p>
                         <div className="space-y-3 text-sm">

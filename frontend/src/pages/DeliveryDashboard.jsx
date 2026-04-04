@@ -178,10 +178,17 @@ const DeliveryDashboard = () => {
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="h-12 w-12 bg-cyan-100 rounded-xl flex items-center justify-center text-2xl shrink-0">
-                                        {d.vehicle?.type?.toLowerCase() === "bike" ||
-                                            d.vehicle?.type?.toLowerCase() === "scooter"
-                                            ? "🏍️"
-                                            : "🚗"}
+                                        {vehicle.image ? (
+                                            <img
+                                                src={vehicle.image}
+                                                alt={vehicle.name}
+                                                className="h-full object-cover w-full"
+                                            />
+                                        ) : (
+                                            <div className="h-full flex items-center justify-center text-4xl">
+                                                {vehicle.type === "bike" || vehicle.type === "scooter" ? "🏍️" : "🚗"}
+                                            </div>
+                                        )}
                                     </div>
                                     <div>
                                         <p className="font-semibold text-gray-800">
