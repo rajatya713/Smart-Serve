@@ -19,7 +19,6 @@ const bookingSchema = new mongoose.Schema(
     },
     pickupDate: { type: Date, required: true },
     dropoffDate: { type: Date, required: true },
-    location: { type: String, required: true },
     deliveryAddress: { type: String, default: "" },
     deliveryLat: { type: Number, default: 0 },
     deliveryLng: { type: Number, default: 0 },

@@ -12,14 +12,13 @@ export const createBooking = async (req, res) => {
       agencyId,
       pickupDate,
       dropoffDate,
-      location,
       deliveryRequired,
       deliveryAddress,
       deliveryLat,
       deliveryLng,
     } = req.body;
 
-    if (!vehicleId || !agencyId || !pickupDate || !dropoffDate || !location) {
+    if (!vehicleId || !agencyId || !pickupDate || !dropoffDate) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -61,9 +60,8 @@ export const createBooking = async (req, res) => {
       agency: agencyId,
       pickupDate: pickup,
       dropoffDate: dropoff,
-      location,
       deliveryRequired,
-      deliveryAddress: deliveryRequired ? deliveryAddress || location : "",
+      deliveryAddress: deliveryRequired ? deliveryAddress : "",
       deliveryLat: deliveryRequired ? deliveryLat || 0 : 0,
       deliveryLng: deliveryRequired ? deliveryLng || 0 : 0,
       deliveryFee,

@@ -166,7 +166,7 @@ const PaymentPage = () => {
                             { label: "Vehicle", value: booking.vehicle?.name },
                             { label: "Pickup", value: formatDate(booking.pickupDate) },
                             { label: "Drop-off", value: formatDate(booking.dropoffDate) },
-                            { label: "Location", value: booking.location },
+                            // { label: "Location", value: booking.location },
                             { label: "Delivery", value: booking.deliveryRequired ? "Yes (Doorstep)" : "No" },
                         ].map((item, i) => (
                             <div key={i} className="flex justify-between text-gray-600">

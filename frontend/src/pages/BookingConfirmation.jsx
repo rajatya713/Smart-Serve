@@ -81,7 +81,7 @@ const BookingConfirmation = () => {
                             { label: "Vehicle", value: booking.vehicle?.name },
                             { label: "Pickup Date", value: formatDate(booking.pickupDate) },
                             { label: "Drop-off Date", value: formatDate(booking.dropoffDate) },
-                            { label: "Location", value: booking.location },
+                            // { label: "Location", value: booking.location },
                             { label: "Delivery", value: booking.deliveryRequired ? "Yes (Doorstep)" : "No" },
                         ].map((item, i) => (
                             <div key={i} className="flex justify-between text-gray-600">
